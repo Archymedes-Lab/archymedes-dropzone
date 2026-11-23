@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1114" />
+    <meta name="description" content="A lightweight battle royale playground by Archymedes. Play, experiment, and evolve new game mechanisms." />
+    <title>DROPZONE — Archymedes Play Lab 01</title>
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="game-canvas" aria-label="Dropzone battle royale game"></canvas>
+      <div id="vignette" class="vignette"></div>
+      <div id="storm-vignette" class="storm-vignette"></div>
+      <div id="damage-layer" class="damage-layer"></div>
+
+      <header class="brand-lockup">
+        <div class="brand-mark"><span></span><span></span><span></span></div>
+        <div class="brand-copy"><strong>ARCHYMEDES</strong><small>PLAY LAB <i>01</i></small></div>
+      </header>
+
+      <section id="hud" class="hud is-hidden" aria-label="Game status">
+        <div class="hud-top-left">
+          <div class="phase-chip"><span class="status-dot"></span><span id="phase-label">SCAVENGE PHASE</span><span class="chip-sep"></span><span id="clock-value">00:00</span></div>
+          <div class="zone-status">
+            <div class="zone-label-row"><span id="zone-label" class="micro-label">STORM FORMS IN</span><strong id="zone-value">0:26</strong></div>
+            <div class="zone-track"><span id="zone-progress"></span></div>
+          </div>
+        </div>
+
+        <div class="hud-top-right">
+          <div class="minimap-wrap"><canvas id="minimap" width="184" height="184"></canvas><span class="minimap-n">N</span></div>
+          <div class="match-stats">
+            <div class="stat"><strong id="remaining-value">20</strong><span class="micro-label">ALIVE</span></div>
+            <div class="stat"><strong id="kills-value">0</strong><span class="micro-label">KILLS</span></div>
+            <div class="stat"><strong id="level-value">1</strong><span class="micro-label">LEVEL</span></div>
+          </div>
+          <ol id="killfeed" class="killfeed"></ol>
+        </div>
+
+        <div id="zone-warning" class="zone-warning"><span class="warning-icon">!</span> IN THE STORM — MOVE TO SAFETY</div>
+
+        <div class="survival-card">
+          <div class="bar-row"><span class="bar-icon shield-icon">◆</span><div class="shield-track"><span id="shield-fill"></span></div><strong id="shield-number">0</strong></div>
+          <div class="bar-row"><span class="bar-icon">+</span><div class="health-track"><span id="health-ghost"></span><span id="health-fill"></span></div><strong id="health-number">120</strong></div>
+          <div class="xp-row"><span class="micro-label">LV <b id="level-small">1</b></span><div class="xp-track"><span id="xp-fill"></span></div><span id="xp-label" class="micro-label">0/65</span></div>
+        </div>
+
+        <div class="weapon-slots">
+          <div class="slot" id="slot-0"><kbd>1</kbd><div class="slot-body"><span class="slot-name">SIDEARM</span><span class="slot-ammo"><b>12</b> / 12</span></div><span class="slot-reload"></span></div>
+          <div class="slot" id="slot-1"><kbd>2</kbd><div class="slot-body"><span class="slot-name">EMPTY</span><span class="slot-ammo"></span></div><span class="slot-reload"></span></div>
+        </div>
+
+        <div id="interact" class="interact"><kbd>E</kbd> <span id="interact-text">SWAP</span></div>
+        <div id="controls-hint" class="controls-hint"><span><kbd>WASD</kbd> MOVE</span><span><kbd>SHIFT</kbd> SPRINT</span><span><kbd>CLICK</kbd> FIRE</span><span><kbd>R</kbd> RELOAD</span><span><kbd>1</kbd><kbd>2</kbd> WEAPON</span><span><kbd>E</kbd> SWAP</span><span><kbd>M</kbd> MUTE</span></div>
+      </section>
+
+      <section id="drop-hud" class="drop-hud is-hidden">
+        <div class="drop-title" id="drop-title">THE DROPSHIP IS CROSSING THE ISLAND</div>
+        <div class="drop-prompt" id="drop-prompt"><kbd>SPACE</kbd> or <kbd>CLICK</kbd> JUMP</div>
+        <div class="drop-alt" id="drop-alt"></div>
+      </section>
+
+      <div id="crosshair" class="crosshair is-hidden"><span></span><i></i><b class="hitmark"></b></div>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div id="perf" class="perf is-hidden"></div>
+
+      <section id="intro" class="overlay intro-overlay">
+        <div class="intro-content">
+          <div class="eyebrow"><span class="eyebrow-line"></span> ARCHYMEDES / GAME MECHANISM LAB</div>
+          <h1>DROP<span>ZONE</span><b>01</b></h1>
+          <p class="subtitle">LAST LIGHT ON THE ISLAND.</p>
+          <p class="intro-copy">Twenty operatives. One island. A storm that keeps closing.<br />Jump from the dropship, loot fast, outlast everyone.</p>
+          <button id="play-button" class="primary-button"><span>BOARD THE DROPSHIP</span><span class="button-arrow">↗</span></button>
+          <div class="intro-meta"><span><i class="meta-dot"></i> SOLO · 20 PLAYERS</span><span>BUILD 0.2.0 / WEBGL</span></div>
+        </div>
+        <div class="intro-footer"><span>DESIGNED TO EVOLVE</span><span>WASD · MOUSE · SHIFT · E · R</span></div>
+      </section>
+
+      <section id="gameover" class="overlay gameover-overlay is-hidden">
+        <div class="gameover-panel">
+          <div class="eyebrow"><span class="eyebrow-line"></span><span id="gameover-eyebrow">SIGNAL LOST</span></div>
+          <div class="placement"><span>#</span><strong id="gameover-place">20</strong></div>
+          <h2 id="gameover-title">ELIMINATED.</h2>
+          <p id="gameover-copy">The island got you this time.</p>
+          <div class="gameover-stats">
+            <div><strong id="go-kills">0</strong><span>KILLS</span></div>
+            <div><strong id="go-time">00:00</strong><span>SURVIVED</span></div>
+            <div><strong id="go-level">1</strong><span>LEVEL</span></div>
+          </div>
+          <button id="replay-button" class="primary-button"><span id="gameover-action">DROP AGAIN</span><span class="button-arrow">↗</span></button>
+          <small>PRESS R · EVERY RUN IS A NEW DATA POINT</small>
+        </div>
+      </section>
+
+      <div class="version-stamp">DROPZONE <span>·</span> 0.2.0</div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
